@@ -10,6 +10,7 @@ class App extends Component {
   };
 
   async componentDidMount() {
+    const veri = "veri";
     const { data: posts } = await axios.get(apiEndpoint);
     this.setState({ posts });
   }
