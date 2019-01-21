@@ -1,8 +1,7 @@
 import React, { Component } from "react";
+import http from "./services/httpServices";
+import config from "./config.json";
 import "./App.css";
-import axios from "axios";
-
-const apiEndpoint = "https://jsonplaceholder.typicode.com/posts";
 
 class App extends Component {
   state = {
@@ -10,14 +9,13 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    const veri = "veri";
-    const { data: posts } = await axios.get(apiEndpoint);
+    const { data: posts } = await http.get(config.apiEndpoint);
     this.setState({ posts });
   }
 
   handleAdd = async () => {
     const obj = { title: "a", body: "safdsf" };
-    const { data: post } = await axios.post(apiEndpoint, obj);
+    const { data: post } = await http.post(config.apiEndpoint, obj);
 
     const posts = [post, ...this.state.posts];
     this.setState({ posts });
@@ -31,7 +29,7 @@ class App extends Component {
     posts[index] = { ...post };
     this.setState({ posts });
     try {
-      await axios.put(apiEndpoint + "/" + post.id, post);
+      await http.put(config.apiEndpoint + "/" + post.id, post);
     } catch (ex) {
       alert("something went wrong");
       this.setState({ posts: originalPosts });
@@ -43,9 +41,10 @@ class App extends Component {
     const posts = this.state.posts.filter(p => p.id !== post.id);
     this.setState({ posts });
     try {
-      await axios.delete(apiEndpoint + "/" + post.id);
+      await http.delete(config.apiEndpoint + "/" + post.id);
     } catch (ex) {
-      alert("Something went wrong when deleting");
+      if (ex.response && ex.response.status === 404)
+        alert("This post has already been deleted");
       this.setState({ posts: originalPosts });
     }
   };
